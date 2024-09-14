@@ -4,4 +4,8 @@ from app.core.database import Database
 class ComplianceService:
     @classmethod
     async def get_rules(cls):
-        return await Database.fetch_compliance_rules()
+        print("there")
+        await Database.connect()
+        result = await Database.fetch_compliance_rules()
+        print("result ", result)
+        return result

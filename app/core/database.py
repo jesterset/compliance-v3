@@ -1,4 +1,5 @@
 import psycopg
+# from psycopg.rows import dict_row
 from app.core.config import Config
 
 class Database:
@@ -6,10 +7,9 @@ class Database:
 
     @classmethod
     async def connect(cls):
+        print("connecting")
         if not cls._connection:
-            with await psycopg.AsyncConnection.connect(Config.POSTGRES_URL) as conn:
-            # Connect asynchronously using psycopg
-                cls._connection = conn
+            cls._connection = await psycopg.AsyncConnection.connect(Config.POSTGRES_URL)
 
     @classmethod
     async def close(cls):
@@ -18,8 +18,13 @@ class Database:
 
     @classmethod
     async def fetch_compliance_rules(cls):
-        query = "SELECT * FROM compliance_rules"
-        async with cls._connection.cursor(row_factory=dict_row) as cur:
-            await cur.execute(query)
+        print("here", cls._connection)
+        async with cls._connection.cursor() as cur:
+            print("in")
+
+            await cur.execute("SELECT * FROM compliance_rules")
+            print("deeper")
+
             results = await cur.fetchall()
+            print("results ", results)
             return results
