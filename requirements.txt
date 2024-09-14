@@ -1,0 +1,10 @@
+falcon
+pydantic
+psycopg[binary]
+elasticsearch
+aiofiles
+python-dotenv
+asyncpg
+uvicorn
+gunicorn
+aiohttp
