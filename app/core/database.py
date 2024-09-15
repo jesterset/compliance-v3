@@ -1,13 +1,13 @@
 import psycopg
 # from psycopg.rows import dict_row
 from app.core.config import Config
+from psycopg.rows import dict_row
 
 class Database:
     _connection = None
 
     @classmethod
     async def connect(cls):
-        print("connecting")
         if not cls._connection:
             cls._connection = await psycopg.AsyncConnection.connect(Config.POSTGRES_URL)
 
@@ -18,13 +18,7 @@ class Database:
 
     @classmethod
     async def fetch_compliance_rules(cls):
-        print("here", cls._connection)
-        async with cls._connection.cursor() as cur:
-            print("in")
-
+        async with cls._connection.cursor(row_factory=dict_row) as cur:
             await cur.execute("SELECT * FROM compliance_rules")
-            print("deeper")
-
             results = await cur.fetchall()
-            print("results ", results)
-            return results
+            return [row for row in results]

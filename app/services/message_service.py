@@ -7,12 +7,8 @@ class MessageService:
     @classmethod
     async def process_realtime_message(cls, user_message: RealTimeMessageRequest):
         elastic_results = await ElasticClient.search_terms('regex_rules_index', user_message)
-        print("elastic_results ", elastic_results)
         matched_terms = [hit['_source'] for hit in elastic_results['hits']['hits']]
-        print("matched_terms ", matched_terms)
         rules = await ComplianceService.get_rules()
-        print("rules ", rules)
-
         return {
             "matches": matched_terms,
             "rules": rules
