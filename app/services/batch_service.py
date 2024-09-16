@@ -1,6 +1,6 @@
 from app.core.database import Database
-from app.core.elastic import ElasticClient
 from app.services.compliance_service import ComplianceService
+from app.utils.message_utils import get_matched_terms
 
 class BatchService:
     @classmethod
@@ -10,15 +10,12 @@ class BatchService:
 
     @classmethod
     async def process_batch_messages(cls):
-        messages = await cls.fetch_chat_messages()
+        chat_messages = await cls.fetch_chat_messages()
         rules = await ComplianceService.get_rules()
         results = []
 
-        for message in messages:
-            # Match input against Elasticsearch sanitization terms
-            elastic_results = await ElasticClient.search_terms('regex_rules_index', message['input'])
-            matched_terms = [hit['_source'] for hit in elastic_results['hits']['hits']]
-
+        for message in chat_messages:
+            matched_terms = await get_matched_terms('regex_rules_index', message['input'])
             # Format result
             result = {
                 "input": message['input'],

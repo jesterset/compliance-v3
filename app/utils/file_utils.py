@@ -4,7 +4,7 @@ import time
 
 async def convert_data(data):
     for row in data:
-        matches_list = [item['sanitiztion_term'] for item in eval(row['matches'])]
+        matches_list = [item for item in eval(row['matches'])]
         rules_list = [item['rule'] for item in eval(row['rules'])]
         row['matches'] = ', '.join(matches_list)
         row['rules'] = ' '.join(rules_list)
