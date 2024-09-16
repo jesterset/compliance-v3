@@ -1,4 +1,3 @@
-# app/services/compliance_service.py
 from app.core.database import Database
 
 class ComplianceService:

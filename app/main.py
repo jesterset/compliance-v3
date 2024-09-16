@@ -1,4 +1,3 @@
-# app/main.py
 import falcon.asgi
 from app.api.routes import register_routes
 from app.core.elastic import ElasticClient

@@ -1,4 +1,3 @@
-# app/services/message_service.py
 from app.core.elastic import ElasticClient
 from app.models.messages import RealTimeMessageRequest
 from app.services.compliance_service import ComplianceService

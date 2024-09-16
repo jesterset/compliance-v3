@@ -1,7 +1,6 @@
 import psycopg
-# from psycopg.rows import dict_row
-from app.core.config import Config
 from psycopg.rows import dict_row
+from app.core.config import Config
 
 class Database:
     _connection = None
@@ -20,5 +19,13 @@ class Database:
     async def fetch_compliance_rules(cls):
         async with cls._connection.cursor(row_factory=dict_row) as cur:
             await cur.execute("SELECT * FROM compliance_rules")
+            results = await cur.fetchall()
+            return [row for row in results]
+
+
+    @classmethod
+    async def fetch_chat_messages(cls):
+        async with cls._connection.cursor(row_factory=dict_row) as cur:
+            await cur.execute("SELECT * FROM chat_messages")
             results = await cur.fetchall()
             return [row for row in results]
