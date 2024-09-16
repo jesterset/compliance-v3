@@ -4,6 +4,22 @@
 ```Shell
 gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
 ```
+```json
+{
+    "emp_id": "12345678",
+    "user_message": "what is the value of tesla going to be in 2025?",
+    "document_uploaded": false,
+    "document_metadata": {
+        "path": "no-path",
+        "name": "doc",
+        "workspace": "workspace-name",
+        "rag_embed_index": "table-name",
+        "rag_raw_index": "table-name"
+    }
+}
+```
+
+
 ### document_metadata_schema
 ```json
 document_metadata_schema {

@@ -56,6 +56,6 @@ class Database:
             list: A list of dictionaries representing the chat messages.
         """
         async with cls._connection.cursor(row_factory=dict_row) as cur:
-            await cur.execute("SELECT * FROM chat_messages")
+            await cur.execute("SELECT * FROM chat_messages WHERE timestamp BETWEEN '2024-09-12T01:01:01' AND '2024-09-12T01:01:01'")
             results = await cur.fetchall()
             return [row for row in results]
