@@ -7,16 +7,40 @@ class Database:
 
     @classmethod
     async def connect(cls):
+        """
+        Connects to the PostgreSQL database using the provided URL.
+
+        Args:
+            cls: The class itself.
+
+        Returns:
+            None
+        """
         if not cls._connection:
             cls._connection = await psycopg.AsyncConnection.connect(Config.POSTGRES_URL)
 
     @classmethod
     async def close(cls):
+        """
+        Closes the connection to the database.
+
+        Args:
+            cls: The class object.
+
+        Returns:
+            None
+        """
         if cls._connection:
             await cls._connection.close()
 
     @classmethod
     async def fetch_compliance_rules(cls):
+        """
+        Fetches all compliance rules from the database.
+
+        Returns:
+            list: A list of dictionaries representing the compliance rules.
+        """
         async with cls._connection.cursor(row_factory=dict_row) as cur:
             await cur.execute("SELECT * FROM compliance_rules")
             results = await cur.fetchall()
@@ -25,6 +49,12 @@ class Database:
 
     @classmethod
     async def fetch_chat_messages(cls):
+        """
+        Fetches all chat messages from the database.
+
+        Returns:
+            list: A list of dictionaries representing the chat messages.
+        """
         async with cls._connection.cursor(row_factory=dict_row) as cur:
             await cur.execute("SELECT * FROM chat_messages")
             results = await cur.fetchall()

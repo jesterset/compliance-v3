@@ -72,20 +72,3 @@ class BatchMessageResponse(BaseModel):
         data['timestamp'] = serialize(data['timestamp'])
         data['rules'] = [rule.to_custom_dict() for rule in self.rules]
         return data
-
-# Generate JSON schemas
-document_metadata_schema = DocumentMetadata.schema()
-real_time_message_request_schema = RealTimeMessageRequest.schema()
-rule_schema = Rule.schema()
-real_time_message_response_schema = RealTimeMessageResponse.schema()
-chat_message_schema = ChatMessage.schema()
-batch_message_response_schema = BatchMessageResponse.schema()
-
-# Print JSON schemas
-import json
-print("document_metadata_schema", json.dumps(document_metadata_schema, indent=2))
-print("real_time_message_request_schema", json.dumps(real_time_message_request_schema, indent=2))
-print("rule_schema", json.dumps(rule_schema, indent=2))
-print("real_time_message_response_schema", json.dumps(real_time_message_response_schema, indent=2))
-print("chat_message_schema", json.dumps(chat_message_schema, indent=2))
-print("batch_message_response_schema", json.dumps(batch_message_response_schema, indent=2))
