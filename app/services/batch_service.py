@@ -16,10 +16,11 @@ class BatchService:
 
         for message in chat_messages:
             matched_terms = await get_matched_terms('regex_rules_index', message['input'])
-            # Format result
             result = {
+                "emp_id": message['emp_id'],
                 "input": message['input'],
                 "chat_type": message['chat_type'],
+                "timestamp": message['timestamp'],
                 "match_count": len(matched_terms),
                 "matches": matched_terms,
                 "rules": rules

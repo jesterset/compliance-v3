@@ -1,5 +1,6 @@
 import falcon
 import logging
+from datetime import datetime
 from app.models.messages import RealTimeMessageRequest, BatchMessageResponse, RealTimeMessageResponse
 from app.services.batch_service import BatchService
 from app.services.message_service import MessageService
@@ -15,8 +16,10 @@ class RealTimeMessagesResource:
         result = await MessageService.process_realtime_message(payload.user_message)
         try:
             response = RealTimeMessageResponse(
+                emp_id=payload.emp_id,
                 user_message=payload.user_message,
                 document_uploaded=payload.document_uploaded,
+                violation_timestamp= datetime.now(tz=None).isoformat(timespec='seconds'),
                 match_count=len(result['matches']),
                 **result
             ).to_custom_dict()

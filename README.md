@@ -1,6 +1,376 @@
 # compliance-v3
 
 
-```cli
+```Shell
 gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
+```
+### document_metadata_schema
+```json
+document_metadata_schema {
+  "properties": {
+    "path": {
+      "default": "no-path",
+      "title": "Path",
+      "type": "string"
+    },
+    "name": {
+      "default": "doc",
+      "title": "Name",
+      "type": "string"
+    },
+    "workspace": {
+      "title": "Workspace",
+      "type": "string"
+    },
+    "rag_embed_index": {
+      "title": "Rag Embed Index",
+      "type": "string"
+    },
+    "rag_raw_index": {
+      "title": "Rag Raw Index",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workspace",
+    "rag_embed_index",
+    "rag_raw_index"
+  ],
+  "title": "DocumentMetadata",
+  "type": "object"
+}
+```
+
+### real_time_message_request_schema
+```json
+real_time_message_request_schema {
+  "$defs": {
+    "DocumentMetadata": {
+      "properties": {
+        "path": {
+          "default": "no-path",
+          "title": "Path",
+          "type": "string"
+        },
+        "name": {
+          "default": "doc",
+          "title": "Name",
+          "type": "string"
+        },
+        "workspace": {
+          "title": "Workspace",
+          "type": "string"
+        },
+        "rag_embed_index": {
+          "title": "Rag Embed Index",
+          "type": "string"
+        },
+        "rag_raw_index": {
+          "title": "Rag Raw Index",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace",
+        "rag_embed_index",
+        "rag_raw_index"
+      ],
+      "title": "DocumentMetadata",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "emp_id": {
+      "title": "Emp Id",
+      "type": "string"
+    },
+    "user_message": {
+      "title": "User Message",
+      "type": "string"
+    },
+    "document_uploaded": {
+      "title": "Document Uploaded",
+      "type": "boolean"
+    },
+    "document_metadata": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DocumentMetadata"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "emp_id",
+    "user_message",
+    "document_uploaded",
+    "document_metadata"
+  ],
+  "title": "RealTimeMessageRequest",
+  "type": "object"
+}
+```
+
+### rule_schema
+```json
+rule_schema {
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "integer"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "active": {
+      "title": "Active",
+      "type": "boolean"
+    },
+    "rule": {
+      "title": "Rule",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "active",
+    "rule"
+  ],
+  "title": "Rule",
+  "type": "object"
+}
+```
+
+### real_time_message_response_schema
+```json
+real_time_message_response_schema {
+  "$defs": {
+    "Rule": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "active": {
+          "title": "Active",
+          "type": "boolean"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "active",
+        "rule"
+      ],
+      "title": "Rule",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "emp_id": {
+      "title": "Emp Id",
+      "type": "string"
+    },
+    "user_message": {
+      "title": "User Message",
+      "type": "string"
+    },
+    "document_uploaded": {
+      "title": "Document Uploaded",
+      "type": "boolean"
+    },
+    "violation_timestamp": {
+      "format": "date-time",
+      "title": "Violation Timestamp",
+      "type": "string"
+    },
+    "match_count": {
+      "title": "Match Count",
+      "type": "integer"
+    },
+    "matches": {
+      "items": {
+        "type": "object"
+      },
+      "title": "Matches",
+      "type": "array"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/Rule"
+      },
+      "title": "Rules",
+      "type": "array"
+    }
+  },
+  "required": [
+    "emp_id",
+    "user_message",
+    "document_uploaded",
+    "violation_timestamp",
+    "match_count",
+    "matches",
+    "rules"
+  ],
+  "title": "RealTimeMessageResponse",
+  "type": "object"
+}
+```
+
+### chat_message_schema
+```json
+chat_message_schema {
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "integer"
+    },
+    "sess_id": {
+      "title": "Sess Id",
+      "type": "string"
+    },
+    "emp_id": {
+      "title": "Emp Id",
+      "type": "string"
+    },
+    "message_id": {
+      "title": "Message Id",
+      "type": "integer"
+    },
+    "input": {
+      "title": "Input",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "feedback_rating": {
+      "title": "Feedback Rating",
+      "type": "string"
+    },
+    "output": {
+      "title": "Output",
+      "type": "string"
+    },
+    "chat_type": {
+      "title": "Chat Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "sess_id",
+    "emp_id",
+    "message_id",
+    "input",
+    "timestamp",
+    "feedback_rating",
+    "output",
+    "chat_type"
+  ],
+  "title": "ChatMessage",
+  "type": "object"
+}
+```
+
+### batch_message_response_schema
+```json
+batch_message_response_schema {
+  "$defs": {
+    "Rule": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "active": {
+          "title": "Active",
+          "type": "boolean"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "active",
+        "rule"
+      ],
+      "title": "Rule",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "emp_id": {
+      "title": "Emp Id",
+      "type": "string"
+    },
+    "input": {
+      "title": "Input",
+      "type": "string"
+    },
+    "chat_type": {
+      "title": "Chat Type",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "match_count": {
+      "title": "Match Count",
+      "type": "integer"
+    },
+    "matches": {
+      "items": {
+        "type": "object"
+      },
+      "title": "Matches",
+      "type": "array"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/Rule"
+      },
+      "title": "Rules",
+      "type": "array"
+    }
+  },
+  "required": [
+    "emp_id",
+    "input",
+    "chat_type",
+    "timestamp",
+    "match_count",
+    "matches",
+    "rules"
+  ],
+  "title": "BatchMessageResponse",
+  "type": "object"
+}
 ```

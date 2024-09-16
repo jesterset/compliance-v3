@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: Compliance API
+  description: API documentation for the Compliance service.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local server
+paths:
+  /chat/messages/realtime:
+    post:
+      summary: Process real-time messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RealTimeMessageRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealTimeMessageResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /chat/messages/batch:
+    get:
+      summary: Process batch messages
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchMessageResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    RealTimeMessageRequest:
+      type: object
+      properties:
+        user_message:
+          type: string
+        document_uploaded:
+          type: boolean
+    RealTimeMessageResponse:
+      type: object
+      properties:
+        user_message:
+          type: string
+        document_uploaded:
+          type: boolean
+        match_count:
+          type: integer
+        matches:
+          type: array
+          items:
+            type: object
+    BatchMessageResponse:
+      type: object
+      properties:
+        user_message:
+          type: string
+        document_uploaded:
+          type: boolean
+        matches:
+          type: array
+          items:
+            type: object
+    ErrorResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string

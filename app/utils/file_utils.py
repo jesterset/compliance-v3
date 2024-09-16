@@ -15,10 +15,10 @@ async def save_to_csv(data, filename_prefix="batch"):
     filename = f"./batch_run/{filename_prefix}_{int(time.time())}.csv"
     async with aiofiles.open(filename, mode='w') as file:
         writer = csv.writer(file)
-        await writer.writerow(['input', 'chat_type', 'match_count', 'matches', 'rules'])
+        await writer.writerow(['emp_id', 'input', 'chat_type', 'timestamp', 'match_count', 'matches', 'rules'])
 
         for row in data:
-            await writer.writerow([row['input'], row['chat_type'], row['match_count'], row['matches'], row['rules']])
+            await writer.writerow([row['emp_id'], row['input'], row['chat_type'], row['timestamp'], row['match_count'], row['matches'], row['rules']])
 
     return {
         "message": "Batch processing completed successfully",
