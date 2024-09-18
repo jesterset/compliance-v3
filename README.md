@@ -390,3 +390,67 @@ batch_message_response_schema {
   "type": "object"
 }
 ```
+
+### elastic_setup
+```json
+PUT /regex_rules_index/_settings
+{
+  "analysis": {
+    "filter": {
+      "synonym_filter": {
+        "type": "synonym_graph",
+        "synonyms": ["predict, forecast, anticipate"]
+      }
+    },
+    "analyzer": {
+      "custom_synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": ["lowercase", "synonym_filter"]
+      }
+    }
+  }
+}
+
+PUT /regex_rules_index/_mapping
+{
+  "properties": {
+    "sanitiztion_term": {
+      "type": "text",
+      "fields": {
+        "stemmed": {
+          "type": "text",
+          "analyzer": "english"
+        },
+        "synonym": {
+          "type": "text",
+          "analyzer": "custom_synonym_analyzer"
+        },
+        "raw": {
+          "type": "keyword"
+        }
+      }
+    },
+    "entity": {
+      "type": "text",
+      "analyzer": "standard"
+    }
+  }
+}
+
+GET /regex_rules_index/_analyze
+{
+  "analyzer": "custom_synonym_analyzer",
+  "text": "forecast"
+}
+
+GET /regex_rules_index/_search
+{
+  "query": {
+    "match": {
+      "sanitiztion_term.synonym": "forecast"
+    }
+  },
+  "size": 100
+}
+```
