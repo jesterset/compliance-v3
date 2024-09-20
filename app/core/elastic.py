@@ -38,12 +38,9 @@ class ElasticClient:
             "query": {
                 "multi_match": {
                     "query": user_message,
-                    "fields": [
-                        "sanitiztion_term^3",
-                        "sanitiztion_term.synonym^2",
-                        "sanitiztion_term.stemmed",
-                    ],
-                    "fuzziness": "AUTO",
+                    "fields": ["sanitization_term"],
+                    "operator": "or",
+                    "fuzziness": "AUTO"
                 }
             }
         }
