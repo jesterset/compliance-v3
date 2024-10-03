@@ -1,17 +1,17 @@
 from app.core.database import Database
 
-class ComplianceService:
+class IntentService:
     @classmethod
-    async def get_rules(cls):
+    async def get_intents(cls):
+        await Database.connect()
+        return await Database.fetch_compliance_rules()
+
+    @classmethod
+    async def get_ml_intent_classification(cls):
         await Database.connect()
         return await Database.fetch_compliance_rules()
     
     @classmethod
-    async def get_ml_violation_classification(cls):
-        await Database.connect()
-        return await Database.fetch_compliance_rules()
-    
-    @classmethod
-    async def get_llm_violation_classification(cls):
+    async def get_llm_intent_classification(cls):
         await Database.connect()
         return await Database.fetch_compliance_rules()

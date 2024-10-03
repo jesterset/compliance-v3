@@ -2,24 +2,30 @@ import os
 import logging
 import pathlib
 from enum import Enum
-from dotenv import load_dotenv
-from typing import Dict, Literal, Set
+from typing import Dict, Literal, Set, Type
 from pydantic_settings import BaseSettings
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
+from dotenv import load_dotenv
 
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Valid env files
 VALID_ENV_FILES: Set[str] = {
-        '.env_dev',
-        '.env_uat', 
-        '.env_qat', 
-        '.env_prod'
+    '.env_dev', 
+    '.env_uat', 
+    '.env_qat', 
+    '.env_prod'
 }
 
+# Define valid environments
 class Environment(str, Enum):
     DEV: Literal['dev'] = 'dev'
-    UAT: Literal['uat']  = 'uat'
-    QAT: Literal['qat']  = 'qat'
-    PROD: Literal['prod']  = 'prod'
+    UAT: Literal['uat'] = 'uat'
+    QAT: Literal['qat'] = 'qat'
+    PROD: Literal['prod'] = 'prod'
 
+# Map environments to corresponding .env files
 ENV_FILE_MAP: Dict[Environment, str] = {
     Environment.DEV: '.env_dev',
     Environment.UAT: '.env_uat',
@@ -27,67 +33,97 @@ ENV_FILE_MAP: Dict[Environment, str] = {
     Environment.PROD: '.env_prod'
 }
 
+# Define ElasticSearch config
 class ElasticConfig(BaseModel):
     host: str = Field(default_factory=lambda: os.getenv('ES_HOST'))
-    # port: int = Field(default_factory=lambda: os.getenv('ES_PORT'))
-    # username: str = Field(default_factory=lambda: os.getenv('ES_USERNAME'))
-    # password: str = Field(default_factory=lambda: os.getenv('ES_PASSWORD'))
+    username: str = Field(default_factory=lambda: os.getenv('ES_USERNAME'))
+    password: str = Field(default_factory=lambda: os.getenv('ES_PASSWORD'))
 
+    def __repr__(self):
+        return f"ElasticConfig(host={self.host}, username={self.username})"
+
+# Define Postgres config
 class PostgresConfig(BaseModel):
     host: str = Field(default_factory=lambda: os.getenv('PG_HOST'))
-    # port: int = Field(default_factory=lambda: os.getenv('PG_PORT'))
-    # username: str = Field(default_factory=lambda: os.getenv('PG_USERNAME'))
-    # password: str = Field(default_factory=lambda: os.getenv('PG_PASSWORD'))
-    # db_name: str = Field(default_factory=lambda: os.getenv('PG_DB_NAME'))
+
+    def __repr__(self):
+        return f"PostgresConfig(host={self.host})"
 
 class Config(BaseSettings):
-    _instance: 'Config' = None
+    _instance: Type['Config'] | None = None  # Singleton instance
+
     env: Environment | None = None
     elastic: ElasticConfig | None = None
     postgres: PostgresConfig | None = None
+    env_file: str | None = None
+
+    def __repr__(self):
+        return (f"Config(env={self.env}, "
+                f"elastic={self.elastic}, "
+                f"postgres={self.postgres})")
 
     @classmethod
-    def load(cls: 'Config', environment: Environment) -> 'Config':
-        cls._instance = cls.load(environment=Environment.DEV)
-        return cls(
-            env=environment,
-            elastic=ElasticConfig(),
-            postgres= PostgresConfig()
-        )
+    def get_instance(cls) -> Type['Config']:
+        if cls._instance is None:
+            raise RuntimeError("Config has not been loaded. Call 'get_config' first.")
+        return cls._instance
+
+    @classmethod
+    def load(cls, environment: Environment = Environment.DEV) -> Type['Config']:
+        logging.info("Loading config for environment: %s", environment)
     
-    class EnvConfig:
-        envirnment: Environment | None = Field(default=Environment.DEV)
-        env_file: Literal['.env_dev', '.env_uat', '.env_qat', '.env_prod'] = ENV_FILE_MAP[Environment.DEV]
-        env_file_encoding: str = 'utf-8'
+        env_file_path = cls._determine_env_file(environment)
+        print(f"env_file_path: {env_file_path}")
+        cls._load_env_file(self=cls,env_file=env_file_path)
 
-        def __repr__(self) -> str:
-            return f'<Config env={self.env}>'
+        # Create the config with fallback logic
+        cls._instance = cls(
+            env=environment if environment else Environment.DEV,
+            elastic=ElasticConfig(),
+            postgres=PostgresConfig(),
+            env_file=cls._determine_env_file(environment)
+        )
         
-        @property
-        def env_file(self) -> str:
-            return ENV_FILE_MAP[self.env]
-        
-        @field_validator('env_file', mode='before')
-        def validate_env_file(cls: 'EnvConfig', value: str) -> str:
-            if value not in VALID_ENV_FILES:
-                raise ValueError(f'Invalid env file: {value}. Must be one of {VALID_ENV_FILES}')
-            return value
-        
-        @classmethod
-        def load(cls: 'EnvConfig', environment: Environment) -> 'EnvConfig':
-            cls.envirnment: Environment = environment
-            cls.env_file: str = ENV_FILE_MAP[environment.value]
+        return cls._instance
 
-            root_path: str = pathlib.Path(__file__).parent.parent.parent
-            env_file_path: str = f'{root_path}/{cls.env_file}'
+    @staticmethod
+    def _determine_env_file(environment: Environment) -> str:
+        return ENV_FILE_MAP.get(environment, '.env_dev')
 
-            if pathlib.Path(env_file_path).exists():
-                load_dotenv(env_file_path, override=True)
-                logging.info(f'Loaded environment variables from: {env_file_path}')
-            else:
-                logging.error(f'{env_file_path} not found. Loading from host environment variables...')
+    def _load_env_file(self, env_file: str):
+        root_path = pathlib.Path(__file__).parent.parent.parent
+        env_file_path = root_path / env_file
+        logging.info(f"Attempting to load environment variables from: {env_file_path}")
+
+        if env_file_path.exists():
+            logging.info(f"Loading environment variables from: {env_file_path}")
+            load_dotenv(dotenv_path=env_file_path, verbose=True, override=True)
+
+            # Verify if the variables are loaded
+            es_host = os.getenv('ES_HOST')
+            es_username = os.getenv('ES_USERNAME')
+            pg_host = os.getenv('PG_HOST')
+            logging.info(f"Loaded ES_HOST: {es_host}, ES_USERNAME: {es_username}, PG_HOST: {pg_host}")
+
+        else:
+            logging.warning(f"{env_file_path} not found. Loading from host environment variables...")
 
 
-config: 'Config' = Config.load(Environment.DEV)
+# Lazy loading logic
+config = None  # This is a placeholder
 
-__all__ = ['config']
+def get_config():
+    global config
+    if config is None:
+        config = Config.load()  # Only initialize when accessed
+    return config
+
+# Example to load the config
+# Instead of calling Config.load() directly, we use get_config()
+config_instance = get_config()
+
+print(config_instance)  # For debugging
+print(config_instance.elastic.username)
+print(config_instance.elastic.password)
+
+__all__ = ['get_config']

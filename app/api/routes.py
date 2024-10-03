@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from app.models.messages import RealTimeMessageRequest, BatchMessageResponse, RealTimeMessageResponse
 from app.services.batch_service import BatchService
-from app.services.message_service import MessageService
+from app.services.realtime_service import MessageService
 from app.utils.file_utils import save_to_csv
 
 logging.basicConfig(level=logging.ERROR)

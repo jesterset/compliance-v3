@@ -1,6 +1,6 @@
 from app.core.database import Database
 from app.services.compliance_service import ComplianceService
-from app.utils.message_utils import get_matched_terms
+from app.utils.elastic_utils import get_matched_terms
 
 class BatchService:
     @classmethod
