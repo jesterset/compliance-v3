@@ -1,7 +1,13 @@
 <p align="center">
     <img src="https://github.com/user-attachments/assets/69390b88-4ecc-4562-8a34-375699b0c271">
 </p>
-
+</br>
+</br>
+<hr>
+<h1 align="center">Not Another Topic Explorer</h1>
+</br>
+</br>
+</br>
 # compliance-v3
 
 
